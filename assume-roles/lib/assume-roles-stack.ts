@@ -1,25 +1,20 @@
 import * as cdk from 'aws-cdk-lib';
 import { Effect, OpenIdConnectPrincipal, OpenIdConnectProvider, PolicyDocument, PolicyStatement, Role } from 'aws-cdk-lib/aws-iam';
 import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
 
 export class AssumeRolesStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    /**
- * Create an Identity provider for GitHub inside your AWS Account. This
- * allows GitHub to present itself to AWS IAM and assume a role.
- */
     const provider = new OpenIdConnectProvider(this, "MyProvider", {
       url: "https://token.actions.githubusercontent.com",
       clientIds: ["sts.amazonaws.com"],
     });
 
-    const githubOrganisation = "Apostolos-Daniel";
+    const githubOrganisation = "Apostolis-Daniel";
+    
     // Change this to the repo you want to push code from
     const repoName = "lambda-o11y-aws-ts";
-
     /**
      * Create a principal for the OpenID; which can allow it to assume
      * deployment roles.
@@ -32,7 +27,6 @@ export class AssumeRolesStack extends cdk.Stack {
         "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
       },
     });
-
 
     /**
      * Create a deployment role that has short lived credentials. The only
@@ -59,6 +53,16 @@ export class AssumeRolesStack extends cdk.Stack {
         }),
       },
     });
+    
+    // Define the policy statement
+    const ssmPolicyStatement = new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: ['ssm:GetParameter'],
+      resources: ['arn:aws:ssm:eu-west-1:643476110649:parameter/cdk-bootstrap/hnb659fds/version'],
+    });
 
+    // Attach the policy statement to the role
+    githubActionsRole.addToPolicy(ssmPolicyStatement);
   }
+
 }
