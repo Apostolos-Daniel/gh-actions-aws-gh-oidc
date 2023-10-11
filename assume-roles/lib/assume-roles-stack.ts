@@ -11,7 +11,7 @@ export class AssumeRolesStack extends cdk.Stack {
       clientIds: ["sts.amazonaws.com"],
     });
 
-    const githubOrganisation = "Apostolis-Daniel";
+    const githubOrganisation = "Apostolos-Daniel";
     
     // Change this to the repo you want to push code from
     const repoName = "lambda-o11y-aws-ts";

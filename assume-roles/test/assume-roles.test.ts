@@ -32,7 +32,7 @@ test('Create an GitHubActionsRole', () => {
                     "Action": "sts:AssumeRoleWithWebIdentity",
                     "Condition": {
                         "StringLike": {
-                            "token.actions.githubusercontent.com:sub": "repo:Apostolis-Daniel/lambda-o11y-aws-ts*"
+                            "token.actions.githubusercontent.com:sub": "repo:Apostolos-Daniel/lambda-o11y-aws-ts*"
                         },
                         "StringEquals": {
                             "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
