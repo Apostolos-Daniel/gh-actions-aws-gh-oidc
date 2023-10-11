@@ -1,0 +1,53 @@
+name: Bootstrap
+on:
+  workflow_dispatch:
+    # https://dev.to/leading-edje/masking-input-parameters-in-github-actions-1ci#:~:text=Then%20calling%20add%2Dmask%20on,following%20steps%20of%20the%20job.
+    inputs:
+      AWS_ACCESS_KEY_ID:
+        description: "Access Key ID with Permissions to deploy IAM, and OIDC"
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        description: "Secret Access Key with Permissions to deploy IAM, and OIDC"
+        required: true
+      AWS_REGION:
+        description: "The region to use, for example eu-west-1"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./assume-roles
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+          cache: 'npm'
+
+      - run: npm install
+
+      - name: Synth stack
+        run: npm run cdk synth
+
+      - name: Add mask to input to hide it from GitHub Actions output
+        run: |
+          AWS_ACCESS_KEY_ID=$(cat $GITHUB_EVENT_PATH | jq '.inputs.AWS_ACCESS_KEY_ID' | sed 's/"//g' )
+          echo "::add-mask::$AWS_ACCESS_KEY_ID"
+          AWS_SECRET_ACCESS_KEY=$(cat $GITHUB_EVENT_PATH | jq '.inputs.AWS_SECRET_ACCESS_KEY' | sed 's/"//g' )
+          echo "::add-mask::$AWS_SECRET_ACCESS_KEY"
+          AWS_REGION=$(cat $GITHUB_EVENT_PATH | jq '.inputs.AWS_REGION' | sed 's/"//g' )
+          echo "::add-mask::$AWS_REGION"
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          aws-access-key-id:  ${{ inputs.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ inputs.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.AWS_REGION }} 
+
+      - name: Deploy stack
+        run: npm run cdk deploy --require-approval never
