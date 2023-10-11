@@ -1,4 +1,4 @@
-name: Bootstrap
+name: Create GH actions assume role
 on:
   workflow_dispatch:
     # https://dev.to/leading-edje/masking-input-parameters-in-github-actions-1ci#:~:text=Then%20calling%20add%2Dmask%20on,following%20steps%20of%20the%20job.
@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
+        
+      - run: ls -la
 
       - uses: actions/setup-node@v2
         with:
