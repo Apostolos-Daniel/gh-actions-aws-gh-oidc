@@ -51,4 +51,4 @@ jobs:
           aws-region: ${{ inputs.AWS_REGION }} 
 
       - name: Deploy stack
-        run: npm run cdk deploy --require-approval never
+        run: npx cdk deploy --require-approval never
