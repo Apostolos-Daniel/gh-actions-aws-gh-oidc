@@ -22,13 +22,12 @@ jobs:
     steps:
       - name: Git clone the repository
         uses: actions/checkout@v3
-        
-      - run: cd ./assume-roles
 
       - uses: actions/setup-node@v2
         with:
           node-version: "18"
           cache: 'npm'
+          cache-dependency-path: 'assume-roles/package-lock.json'
 
       - run: npm install
 
